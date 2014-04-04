@@ -1,0 +1,17 @@
+prefer "lrs";
+
+my $d = dodecahedron();
+
+my $v1 = $d->VERTICES->minor([0,3,10,14,7,13,11,19],All);
+my $v2 = $d->VERTICES->minor([0,5,6,9,8,15,17,13],All);
+my $v3 = $d->VERTICES->minor([1,2,8,11,16,18,9,10],All);
+my $v4 = $d->VERTICES->minor([1,5,7,12,18,15,4,14],All);
+my $v5 = $d->VERTICES->minor([2,4,17,19,3,6,16,12],All);
+
+my $p1 = new Polytope<Rational>(VERTICES=>$v1);
+my $p2 = new Polytope<Rational>(VERTICES=>$v2);
+my $p3 = new Polytope<Rational>(VERTICES=>$v3);
+my $p4 = new Polytope<Rational>(VERTICES=>$v4);
+my $p5 = new Polytope<Rational>(VERTICES=>$v5);
+
+jreality(compose($p1->VISUAL(VertexStyle=>'hidden',FacetColor=>'tud1b'), $p2->VISUAL(VertexStyle=>'hidden', FacetColor=>'tud3b'), $p3->VISUAL(VertexStyle=>'hidden',FacetColor=>'tud5b'),$p4->VISUAL(VertexStyle=>'hidden',FacetColor=>'tud7b'),$p5->VISUAL(VertexStyle=>'hidden',FacetColor=>'tud9b')));

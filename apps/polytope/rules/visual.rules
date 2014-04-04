@@ -1,0 +1,136 @@
+# Copyright (c) 2011-2014 Silke Horn
+# http://solros.de/polymake/mypolytopes
+# 
+# This file is part of the polymake extension mypolytopes.
+# 
+# mypolytopes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# mypolytopes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with mypolytopes.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# @category Visualization
+# Visualises the subdivision //s// of //p//.
+# @param Polytope p
+# @param Array<Set<Int>> s
+# @return Visual::Polytope
+user_function visual_subdivision {
+	my $p=new Polytope<Rational>(shift);
+	my $s=shift;
+
+	if ($p->DIM>3) {die "I can only visualise subdivisions of polytopes of dimension at most 3";}
+
+	my @cells_visual=();
+	
+	foreach  (@$s) {	
+		my $c=new Polytope<Rational>(VERTICES=>$p->VERTICES->minor($_,All));
+		push(@cells_visual,$c->VISUAL(VertexStyle=>'hidden', FacetColor=>'white'));
+	}
+	compose(@cells_visual);
+}
+
+
+# @category Visualization
+# Visualises the subdivision //s// of //p//.
+# @param Polytope p
+# @param Array<Set<Int>> s
+# @return Visual::Polytope
+user_function visual_lattice_subdivision {
+	my $p=shift;
+	my $s=shift;
+	if ($p->DIM>3) {
+		die "I can only visualise subdivisions of polytopes of dimension at most 3";}
+	my @cells_visual=();
+	foreach (@$s) {
+		my $c=new Polytope<Rational>(VERTICES=>$p->LATTICE_POINTS->minor($_,All));
+		push(@cells_visual,$c->VISUAL(VertexStyle=>'hidden'));
+	}
+	compose(@cells_visual);
+}
+
+
+# @category Visualization
+# Visualises the [[regular_subdivision|regular subdivision]] of //p// defined by the height vector //height//.
+# @param Polytope p
+# @param Vector<Int> height
+# @return Visual::Polytope
+user_function visual_regular_subdivision {
+	my $p=new Polytope<Rational>(shift);
+	my $h=shift;
+
+	if ($p->DIM!=2) {die "I can only visualise subdivisions of 2-dimensional polytopes";}
+
+	my $s=regular_subdivision($p->VERTICES,$h);
+
+	my @cells_visual=();
+	
+	foreach  (@$s) {
+		my @cur=();
+		foreach (@$_) {
+			push(@cur, $h->[$_]/2+1/2);
+		}
+		
+		my $b = new Matrix<Rational>(new Vector<Rational>(@cur));
+		my $A = new Matrix<Rational>($p->VERTICES->minor($_,All) | transpose($b));
+	
+		my $c = new Polytope<Rational>(VERTICES=>$A);
+		push(@cells_visual,$c->VISUAL(VertexStyle=>'hidden', FacetColor=>'tud1b', FacetTransparency=>0.5));
+	}
+	compose(visual_subdivision($p,$s), @cells_visual);
+#	visualize(new Visual::Polytope( Name => "",
+#				Polytope => $p,
+#				@cells_visual));
+}
+
+
+# @category Visualization
+# Visualises a polytope //p// together with its polar.
+# @param Polytope p must be 3-dimensional
+# @param Color c1 facet color for //p//, default: orange
+# @param Color c2 facet color for the polar, default: blue
+# @return Visual::Polytope
+user_function visual_duals {
+	my ($p, $c1, $c2) =@_;
+	$p = new Polytope<Float>($p);
+	unless (defined $c2) {
+		$c1='tud7b';
+		$c2='tud1b';
+	}
+	
+	my $a=project_to_unit_sphere($p);
+	my $b=polarize($a);
+	
+	compose($a->VISUAL(VertexStyle=>'hidden', FacetColor=>$c1), $b->VISUAL(FacetTransparency=>.7, FacetColor=>$c2, VertexStyle=>'hidden'));
+}
+
+# @category Visualization
+# Visualises a polytope //p// together with its polar.
+# @param Polytope p must be 3-dimensional
+# @param Rational r the radius, optional
+# @param Color c1 facet color for //p//, default: red
+# @param Color c2 facet color for the polar, default: blue
+# @return Visual::Polytope
+user_function visual_duals_graph {
+	my ($p, $rad, $c1, $c2) =@_;
+	$p = new Polytope<Float>($p);
+	
+	unless (defined $rad) { $rad = 1.15; }
+	unless (defined $c2) {
+		$c1='tud9c';
+		$c2='tud1b';
+	}
+	
+	my $a=project_to_unit_sphere($p, $rad);
+	my $b=polarize($a);
+	
+	compose($a->VISUAL(VertexStyle=>'hidden', FacetColor=>'white', FacetTransparency=>.6, EdgeColor=>$c1), $b->VISUAL(VertexStyle=>'hidden', FacetColor=>'white', FacetTransparency=>.6, EdgeColor=>$c2));
+
+}

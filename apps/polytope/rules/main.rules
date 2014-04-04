@@ -1,0 +1,72 @@
+# Copyright (c) 2011-2014 Silke Horn
+# http://solros.de/polymake/mypolytopes
+# 
+# This file is part of the polymake extension mypolytopes.
+# 
+# mypolytopes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# mypolytopes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with mypolytopes.  If not, see <http://www.gnu.org/licenses/>.
+
+INCLUDE
+	constructions.rules
+	visual.rules
+
+object Polytope {
+
+# @category Basic properties
+# Returns true if the polytope is __empty__. Equivalent to ![[FEASIBLE]].
+property EMPTY : Bool;
+
+rule EMPTY : FEASIBLE {
+	$this->EMPTY = !$this->FEASIBLE;
+}
+
+}	# end Polytope
+
+
+# @category Utilities
+# Checks whether two polytopes are equal.
+# @param Polytope p1
+# @param Polytope p2
+# @return Bool
+user_function equal_polytopes {
+	my ($p,$q)=@_;
+	
+	my $sp=new Set<Vector<Rational>>;
+	my $sq=new Set<Vector<Rational>>;
+
+	foreach (@$p->VERTICES) {
+		$sp+=$_;
+	}
+	foreach (@$q->VERTICES) {
+		$sq+=$_;
+	}
+	return ($sp==$sq);
+}
+
+
+sub abs_val {
+	my $v = new Vector<Float>(shift);
+	my $s = 0;
+	my $n = @$v;
+	for (my $i = 0; $i < $n; ++$i) {
+		my $r = $v->[$i];
+		$s += $r*$r;
+	}
+	return sqrt($s);
+}
+
+
+
+
+
+

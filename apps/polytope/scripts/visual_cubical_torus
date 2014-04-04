@@ -1,0 +1,48 @@
+# Copyright (c) 2011-2014 Silke Horn
+# http://solros.de/polymake/mypolytopes
+# 
+# This file is part of the polymake extension mypolytopes.
+# 
+# mypolytopes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# mypolytopes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with mypolytopes.  If not, see <http://www.gnu.org/licenses/>.
+
+
+prefer "cdd";
+
+my $a1 = new Matrix<Rational>([[1,1,-1,-1],[1,1,1,-1],[1,1,-1,1],[1,1,1,1],[1,2,-2,-2],[1,2,2,-2],[1,2,-2,2],[1,2,2,2]]);
+my $a2 = new Matrix<Rational>([[1,-1,-1,-1],[1,-1,1,-1],[1,-1,-1,1],[1,-1,1,1],[1,-2,-2,-2],[1,-2,2,-2],[1,-2,-2,2],[1,-2,2,2]]);
+my $a3 = new Matrix<Rational>([[1,-1,1,-1],[1,1,1,-1],[1,-1,1,1],[1,1,1,1],[1,-2,2,-2],[1,2,2,-2],[1,-2,2,2],[1,2,2,2]]);
+my $a4 = new Matrix<Rational>([[1,-1,-1,-1],[1,1,-1,-1],[1,-1,-1,1],[1,1,-1,1],[1,-2,-2,-2],[1,2,-2,-2],[1,-2,-2,2],[1,2,-2,2]]);
+
+my $p1 = new Polytope<Rational>(VERTICES=>$a1);
+my $p2 = new Polytope<Rational>(VERTICES=>$a2);
+my $p3 = new Polytope<Rational>(VERTICES=>$a3);
+my $p4 = new Polytope<Rational>(VERTICES=>$a4);
+
+my @x = (0,1,0,0,0,1);
+my @y = (1,0,0,1,0,1);
+
+sub adjust_colors {
+	my @x = @_;
+	my @r = ();
+	
+	foreach(@x) {
+		if ($_ ==1) {push(@r,'tud6b');} elsif ($_==0) {push(@r,'tud1b');} else {push(@r,'tud9c');}
+	}
+	return \@r;
+}
+
+compose($p1->VISUAL(VertexStyle=>'hidden', FacetColor=>adjust_colors(@x)),
+	$p2->VISUAL(VertexStyle=>'hidden', FacetColor=>adjust_colors(@x)),
+	$p3->VISUAL(VertexStyle=>'hidden', FacetColor=>adjust_colors(@y)),
+	$p4->VISUAL(VertexStyle=>'hidden', FacetColor=>adjust_colors(@y)));

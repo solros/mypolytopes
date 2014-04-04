@@ -1,0 +1,126 @@
+# Copyright (c) 2011-2014 Silke Horn
+# http://solros.de/polymake/mypolytopes
+# 
+# This file is part of the polymake extension mypolytopes.
+# 
+# mypolytopes is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# mypolytopes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with mypolytopes.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# @category Producing from scratch
+# Returns the __football polytope__, that is, the truncated [[icosahedron]].
+# @return Polytope
+user_function football {
+	my $i=icosahedron();
+	my $fb=truncation($i, All, cutoff=>2/3);
+	return $fb;
+}
+
+# @category Producing from scratch
+# Returns the __rhombic triacontahedron__. 
+# 
+# This is a 3-dimensional polytope with 30 rhombic facets and can be obtained as a projection of a 6-dimensional cube.
+# @return Polytope
+user_function rhombictriacontahedron {
+	my $p=new Polytope<QuadraticExtension>(icosahedron());
+
+	my $n=$p->N_EDGES;
+	my $e=$p->GRAPH->EDGES;
+	my @f = ();
+	for (my $i=0; $i<$n; ++$i) {
+		my $edge=$e->[$i];
+		my @edge=@{$edge};
+		
+		my $v1=$edge[0];
+		my $v2=$edge[1];
+		
+		my $f1=$p->VERTICES->[$v1];
+		my $f2=$p->VERTICES->[$v2];
+		
+		my $f=new Vector<QuadraticExtension>($f1+$f2);
+		$f->[0]=1;
+		push @f, $f;
+	}
+		
+	my $nfacets=new Matrix<QuadraticExtension>(@f);
+	return new Polytope<QuadraticExtension>(INEQUALITIES=>$nfacets);
+}
+
+
+# @category Producing a new polytope from others
+# Projects the vertices of a polytope //P// to the sphere of radius //r//
+# @param Polytope P
+# @param Rational r the radius, default 1
+# @return Polytope<Float>
+user_function  project_to_unit_sphere {
+	my $q = shift;
+	my $p = new Polytope<Float>($q);
+	my $rad = shift;
+	
+	unless (defined $rad) {$rad = 1;}
+	
+	my $v = $p->VERTICES->minor(All, ~[0]);
+	my @vs = ();
+	
+	for (my $i=0; $i<$v->rows(); ++$i) {
+		my $r = new Vector<Float>($v->row($i));
+		push @vs, $rad/abs_val($r)*$r;
+	}
+	my $A = new Matrix<Float>(@vs);
+	my $o = ones_vector<Float>($A->rows());
+	my $nv = new Matrix<Float>($o | $A);
+	
+	return new Polytope<Rational>(VERTICES=>$nv);
+}
+
+
+# @category Producing a new polytope from others
+# Truncates all vertices and edges of a polytope //p//.
+# @param Polytope<Rational> p
+# @param Rational a How far do we truncate the vertices?
+# @param Rational b How far do we truncate the edges?
+# @return Polytope
+user_function truncate_faces {
+	my $p=shift;
+	my $a=shift; my $b=shift;
+	
+	my @f=();
+	
+	foreach my $v (@{$p->VERTICES}){
+		my $w=new Vector<Rational>($v);
+		$w->[0]=$a;
+		push @f, $w;
+	}
+	my $n=$p->N_EDGES;
+	my $e=$p->GRAPH->EDGES;
+	for (my $i=0; $i<$n; ++$i) {
+		my $edge=$e->[$i];
+		my @edge=@{$edge};
+		
+		my $v1=$edge[0];
+		my $v2=$edge[1];
+		
+		my $f1=$p->VERTICES->[$v1];
+		my $f2=$p->VERTICES->[$v2];
+		
+		my $f=new Vector<Rational>($f1+$f2);
+		$f->[0]=$b;
+		push @f, $f;
+	}
+		
+	my $nfacets=new Matrix<Rational>(@f); # new facets
+	my $ofacets=new Matrix<Rational>($p->FACETS);	# old facets
+	my $facets=new Matrix<Rational>($nfacets/$ofacets);
+	return new Polytope<Rational>(INEQUALITIES=>$facets);
+}
+
