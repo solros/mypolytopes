@@ -17,7 +17,7 @@
 # along with mypolytopes.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# @category Producing from scratch
+# @category Producing a polytope from scratch
 # Returns the __football polytope__, that is, the truncated [[icosahedron]].
 # @return Polytope
 user_function football {
@@ -26,7 +26,7 @@ user_function football {
 	return $fb;
 }
 
-# @category Producing from scratch
+# @category Producing a polytope from scratch
 # Returns the __rhombic triacontahedron__. 
 # 
 # This is a 3-dimensional polytope with 30 rhombic facets and can be obtained as a projection of a 6-dimensional cube.
@@ -57,7 +57,7 @@ user_function rhombictriacontahedron {
 }
 
 
-# @category Producing a new polytope from others
+# @category Producing a polytope from polytopes
 # Projects the vertices of a polytope //P// to the sphere of radius //r//
 # @param Polytope P
 # @param Rational r the radius, default 1
@@ -84,7 +84,7 @@ user_function  project_to_unit_sphere {
 }
 
 
-# @category Producing a new polytope from others
+# @category Producing a polytope from polytopes
 # Truncates all vertices and edges of a polytope //p//.
 # @param Polytope<Rational> p
 # @param Rational a How far do we truncate the vertices?
