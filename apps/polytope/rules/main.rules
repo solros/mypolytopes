@@ -33,26 +33,6 @@ rule EMPTY : FEASIBLE {
 }	# end Polytope
 
 
-# @category Utilities
-# Checks whether two polytopes are equal.
-# @param Polytope p1
-# @param Polytope p2
-# @return Bool
-user_function equal_polytopes {
-	my ($p,$q)=@_;
-	
-	my $sp=new Set<Vector<Rational>>;
-	my $sq=new Set<Vector<Rational>>;
-
-	foreach (@$p->VERTICES) {
-		$sp+=$_;
-	}
-	foreach (@$q->VERTICES) {
-		$sq+=$_;
-	}
-	return ($sp==$sq);
-}
-
 
 sub abs_val {
 	my $v = new Vector<Float>(shift);
